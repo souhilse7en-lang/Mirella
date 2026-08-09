@@ -30,7 +30,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const collection = product.collections as { name: string; slug: string } | null;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12 pb-28 md:pb-12">
       <ProductClientView
         product={{
           id: product.id,

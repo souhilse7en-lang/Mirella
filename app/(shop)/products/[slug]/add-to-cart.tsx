@@ -97,10 +97,19 @@ export default function AddToCart({
       {/* Tailles — masquées pour les accessoires */}
       {!isAccessoire && sizes.length > 0 && (
         <div>
-          <p className="text-sm font-medium mb-2" style={{ color: "#4A2E38" }}>
-            {typeProduit === "chaussure" ? "Pointure" : "Taille"}
-          </p>
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex justify-between items-end mb-3">
+            <p className="text-sm font-medium" style={{ color: "#4A2E38" }}>
+              {typeProduit === "chaussure" ? "Pointure" : "Taille"}
+            </p>
+            <a
+              href="/livraison"
+              className="text-xs underline hover:opacity-70 transition-opacity"
+              style={{ color: "#9B6B76" }}
+            >
+              Guide des tailles
+            </a>
+          </div>
+          <div className="grid grid-cols-4 gap-2">
             {sizes.map((size) => {
               const variant = variants.find((v) => v.size === size && (!hasColors || v.color === selectedColor));
               const outOfStock = variant ? variant.stock === 0 : true;
@@ -110,8 +119,8 @@ export default function AddToCart({
                   type="button"
                   onClick={() => !outOfStock && setSelectedSize(size)}
                   disabled={outOfStock}
-                  className={`min-w-[44px] h-10 px-3 text-sm border rounded-lg transition-all ${
-                    outOfStock ? "opacity-30 line-through cursor-not-allowed" : "cursor-pointer"
+                  className={`py-3 text-sm border rounded-lg transition-all ${
+                    outOfStock ? "opacity-30 line-through cursor-not-allowed" : "cursor-pointer hover:border-[#4A2E38]"
                   }`}
                   style={{
                     backgroundColor: selectedSize === size ? "#4A2E38" : "transparent",
@@ -127,22 +136,42 @@ export default function AddToCart({
         </div>
       )}
 
+      {/* Bouton desktop */}
       <Button
         onClick={handleAdd}
         disabled={!selectedVariant || selectedVariant.stock === 0 || (!isAccessoire && !selectedSize)}
-        className="w-full h-12 text-base rounded-xl"
-        style={{ backgroundColor: "#4A2E38", color: "#FAF7F5" }}
+        className="hidden md:flex w-full h-12 text-base rounded-xl items-center justify-center"
+        style={{ backgroundColor: "#4A2E38", color: "#FAF7F5", boxShadow: "0 4px 20px rgba(201,138,155,0.08)" }}
       >
         {added ? (
           <><Check size={18} className="mr-2" />Ajouté au panier</>
         ) : (
-          <><ShoppingBag size={18} className="mr-2" />Ajouter au panier</>
+          <><ShoppingBag size={18} className="mr-2" />Ajouter au panier — {Number(product.price).toLocaleString("fr-FR")} DA</>
         )}
       </Button>
 
       {selectedVariant && selectedVariant.stock <= 5 && selectedVariant.stock > 0 && (
         <p className="text-xs" style={{ color: "#C9A961" }}>Plus que {selectedVariant.stock} en stock !</p>
       )}
+
+      {/* Barre mobile fixe en bas */}
+      <div
+        className="md:hidden fixed bottom-0 left-0 w-full z-50 p-4"
+        style={{ backgroundColor: "#FAF7F5", borderTop: "1px solid rgba(201,138,155,0.2)", boxShadow: "0 -4px 16px rgba(201,138,155,0.08)" }}
+      >
+        <Button
+          onClick={handleAdd}
+          disabled={!selectedVariant || selectedVariant.stock === 0 || (!isAccessoire && !selectedSize)}
+          className="w-full h-12 text-base rounded-xl flex items-center justify-center active:scale-95 transition-transform"
+          style={{ backgroundColor: "#4A2E38", color: "#FAF7F5" }}
+        >
+          {added ? (
+            <><Check size={18} className="mr-2" />Ajouté au panier</>
+          ) : (
+            <><ShoppingBag size={18} className="mr-2" />Ajouter au panier</>
+          )}
+        </Button>
+      </div>
     </div>
   );
 }
