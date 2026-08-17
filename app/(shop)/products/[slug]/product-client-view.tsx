@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Truck } from "lucide-react";
+import { Heart, Truck, Clock } from "lucide-react";
 import AddToCart from "./add-to-cart";
 
 interface ColorEntry {
@@ -197,7 +197,7 @@ export default function ProductClientView({
             {product.name}
           </h1>
           {disponibilite === "sur_commande" && (
-            <div className="mb-3">
+            <div className="mb-3 flex flex-wrap items-center gap-2">
               <span
                 className="inline-block text-xs px-3 py-1 rounded-full font-medium tracking-wide"
                 style={{ backgroundColor: "#C9A961", color: "#fff" }}
@@ -205,9 +205,10 @@ export default function ProductClientView({
                 Sur commande
               </span>
               {delaiSurCommande && (
-                <p className="text-sm mt-1.5" style={{ color: "#9B6B76" }}>
-                  Livraison sous {delaiSurCommande}
-                </p>
+                <span className="flex items-center gap-1 text-sm" style={{ color: "#9B6B76" }}>
+                  <Clock size={13} style={{ color: "#C9A961", flexShrink: 0 }} />
+                  Livraison sous {delaiSurCommande.replace(/^(\d+)-(\d+)/, "$1 à $2")}
+                </span>
               )}
             </div>
           )}

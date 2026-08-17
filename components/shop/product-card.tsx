@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Clock } from "lucide-react";
 
 interface ProductCardProps {
   slug: string;
@@ -11,6 +12,7 @@ interface ProductCardProps {
   compare_price?: number | null;
   is_featured?: boolean;
   disponibilite?: string;
+  delaiSurCommande?: string | null;
   images: { url: string; is_primary: boolean; sort_order?: number }[];
   variants?: { color: string; color_hex: string; image_url?: string | null }[];
   aspect?: string;
@@ -23,6 +25,7 @@ export default function ProductCard({
   compare_price,
   is_featured = false,
   disponibilite = "stock",
+  delaiSurCommande,
   images,
   variants = [],
   aspect = "aspect-[3/4]",
@@ -139,6 +142,12 @@ export default function ProductCard({
           </span>
         )}
       </div>
+      {disponibilite === "sur_commande" && delaiSurCommande && (
+        <p className="flex items-center gap-1 mt-1 text-[11px]" style={{ color: "#C9A961" }}>
+          <Clock size={11} />
+          {delaiSurCommande.replace(/^(\d+)-(\d+)/, "$1 à $2")}
+        </p>
+      )}
     </Link>
   );
 }

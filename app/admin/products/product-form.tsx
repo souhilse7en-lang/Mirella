@@ -62,6 +62,19 @@ function buildStocksFromVariants(variants: Variant[], colors: ColorEntry[]): Rec
   return result;
 }
 
+function parseDelai(val: string | null | undefined): [number, number] {
+  if (!val) return [7, 14];
+  const m = val.match(/^(\d+)-(\d+)/);
+  if (m) return [Number(m[1]), Number(m[2])];
+  const s = val.match(/^(\d+)/);
+  if (s) return [Number(s[1]), Number(s[1])];
+  return [7, 14];
+}
+
+function formatDelai(min: number, max: number): string {
+  return min === max ? `${min} jours` : `${min}-${max} jours`;
+}
+
 export default function ProductForm({
   initial,
   variants: initVariants = [],
@@ -79,6 +92,8 @@ export default function ProductForm({
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [delaiMin, setDelaiMin] = useState<number>(() => parseDelai(initial?.delai_sur_commande)[0]);
+  const [delaiMax, setDelaiMax] = useState<number>(() => parseDelai(initial?.delai_sur_commande)[1]);
 
   const [form, setForm] = useState<Product>(
     initial ?? {
@@ -112,6 +127,18 @@ export default function ProductForm({
     setStocks({});
   }
 
+  function handleDelaiMin(val: number) {
+    const min = Math.max(1, val || 1);
+    setDelaiMin(min);
+    setField("delai_sur_commande", formatDelai(min, delaiMax));
+  }
+
+  function handleDelaiMax(val: number) {
+    const max = Math.max(1, val || 1);
+    setDelaiMax(max);
+    setField("delai_sur_commande", formatDelai(delaiMin, max));
+  }
+
   // ── Couleurs ──────────────────────────────────────────────────────────────
   function addColor() {
     setColors((c) => [...c, { name: "", hex: "#000000", image: "" }]);
@@ -141,6 +168,12 @@ export default function ProductForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    // Validation délai sur commande
+    if (form.disponibilite === "sur_commande" && delaiMax < delaiMin) {
+      setError("Le délai maximum ne peut pas être inférieur au délai minimum.");
+      return;
+    }
 
     // Validation : chaque couleur nommée doit avoir une photo
     const namedColors = colors.filter((c) => c.name.trim() !== "");
@@ -320,8 +353,13 @@ export default function ProductForm({
             <select
               value={form.disponibilite ?? "stock"}
               onChange={(e) => {
-                setField("disponibilite", e.target.value);
-                if (e.target.value === "stock") setField("delai_sur_commande", null);
+                const val = e.target.value;
+                setField("disponibilite", val);
+                if (val === "stock") {
+                  setField("delai_sur_commande", null);
+                } else {
+                  setField("delai_sur_commande", formatDelai(delaiMin, delaiMax));
+                }
               }}
               className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
             >
@@ -329,20 +367,60 @@ export default function ProductForm({
               <option value="sur_commande">Sur commande</option>
             </select>
           </div>
-          {form.disponibilite === "sur_commande" && (
-            <div className="col-span-2">
-              <label className="text-sm font-medium block mb-1.5">
-                Délai de livraison
-                <span className="text-muted-foreground font-normal ml-1">(ex : "7-10 jours")</span>
-              </label>
-              <input
-                placeholder="7-10 jours"
-                value={form.delai_sur_commande ?? ""}
-                onChange={(e) => setField("delai_sur_commande", e.target.value || null)}
-                className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-              />
+
+          {/* Zone délai — transition douce avec grid-template-rows */}
+          <div
+            className="col-span-2"
+            style={{
+              display: "grid",
+              gridTemplateRows: form.disponibilite === "sur_commande" ? "1fr" : "0fr",
+              transition: "grid-template-rows 0.3s ease",
+            }}
+          >
+            <div style={{ overflow: "hidden" }}>
+              <div
+                className="rounded-xl p-4 mt-1"
+                style={{
+                  backgroundColor: "rgba(201,169,97,0.08)",
+                  border: "1px solid rgba(201,169,97,0.3)",
+                }}
+              >
+                <p className="text-xs font-medium mb-3" style={{ color: "#9B6B76" }}>
+                  Délai de livraison estimé
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium block mb-1.5">Minimum (jours)</label>
+                    <input
+                      type="number"
+                      min={1}
+                      value={delaiMin}
+                      onChange={(e) => handleDelaiMin(Number(e.target.value))}
+                      className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring text-center"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium block mb-1.5">Maximum (jours)</label>
+                    <input
+                      type="number"
+                      min={1}
+                      value={delaiMax}
+                      onChange={(e) => handleDelaiMax(Number(e.target.value))}
+                      className={`w-full border rounded-md px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring text-center ${delaiMax < delaiMin ? "border-destructive focus:ring-destructive" : "border-input"}`}
+                    />
+                    {delaiMax < delaiMin && (
+                      <p className="text-xs text-destructive mt-1">Doit être ≥ au minimum</p>
+                    )}
+                  </div>
+                </div>
+                {delaiMin > 0 && delaiMax >= delaiMin && (
+                  <p className="text-xs mt-3" style={{ color: "#C9A961" }}>
+                    Affichage client : Livraison sous {delaiMin} à {delaiMax} jours
+                  </p>
+                )}
+              </div>
             </div>
-          )}
+          </div>
         </div>
       </section>
 
