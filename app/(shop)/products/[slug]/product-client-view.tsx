@@ -248,6 +248,7 @@ export default function ProductClientView({
           colorList={colorList}
           selectedColor={selectedColor}
           onColorChange={selectColor}
+          disponibilite={disponibilite}
         />
 
         {/* Bloc livraison */}

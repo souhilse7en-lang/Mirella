@@ -16,6 +16,7 @@ export default function AddToCart({
   colorList = [],
   selectedColor = "",
   onColorChange,
+  disponibilite = "stock",
 }: {
   product: { id: string; name: string; slug: string; price: number };
   variants: Variant[];
@@ -24,18 +25,22 @@ export default function AddToCart({
   colorList?: ColorEntry[];
   selectedColor?: string;
   onColorChange?: (color: string) => void;
+  disponibilite?: string;
 }) {
   const { add } = useCart();
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [added, setAdded] = useState(false);
 
   const isAccessoire = typeProduit === "accessoire";
+  const surCommande = disponibilite === "sur_commande";
 
   const sizes = [...new Set(variants.map((v) => v.size))];
   const hasColors = colorList.length > 0;
 
   const accessoireVariant = isAccessoire
-    ? variants.find((v) => v.stock > 0 && (!hasColors || v.color === selectedColor)) ?? variants[0]
+    ? (surCommande
+        ? (variants.find((v) => !hasColors || v.color === selectedColor) ?? variants[0])
+        : (variants.find((v) => v.stock > 0 && (!hasColors || v.color === selectedColor)) ?? variants[0]))
     : undefined;
 
   const selectedVariant = isAccessoire
@@ -112,7 +117,7 @@ export default function AddToCart({
           <div className="grid grid-cols-4 gap-2">
             {sizes.map((size) => {
               const variant = variants.find((v) => v.size === size && (!hasColors || v.color === selectedColor));
-              const outOfStock = variant ? variant.stock === 0 : true;
+              const outOfStock = surCommande ? false : (variant ? variant.stock === 0 : true);
               return (
                 <button
                   key={size}
@@ -139,7 +144,7 @@ export default function AddToCart({
       {/* Bouton desktop */}
       <Button
         onClick={handleAdd}
-        disabled={!selectedVariant || selectedVariant.stock === 0 || (!isAccessoire && !selectedSize)}
+        disabled={!selectedVariant || (!surCommande && selectedVariant.stock === 0) || (!isAccessoire && !selectedSize)}
         className="hidden md:flex w-full h-12 text-base rounded-xl items-center justify-center"
         style={{ backgroundColor: "#4A2E38", color: "#FAF7F5", boxShadow: "0 4px 20px rgba(201,138,155,0.08)" }}
       >
@@ -161,7 +166,7 @@ export default function AddToCart({
       >
         <Button
           onClick={handleAdd}
-          disabled={!selectedVariant || selectedVariant.stock === 0 || (!isAccessoire && !selectedSize)}
+          disabled={!selectedVariant || (!surCommande && selectedVariant.stock === 0) || (!isAccessoire && !selectedSize)}
           className="w-full h-12 text-base rounded-xl flex items-center justify-center active:scale-95 transition-transform"
           style={{ backgroundColor: "#4A2E38", color: "#FAF7F5" }}
         >
