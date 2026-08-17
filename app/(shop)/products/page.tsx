@@ -24,7 +24,7 @@ export default async function ProductsPage({
 
   let query = supabase
     .from("products")
-    .select(`id, name, slug, price, compare_price, is_featured, product_images(url, is_primary, sort_order), product_variants(color, color_hex, image_url)`, { count: "exact" })
+    .select(`id, name, slug, price, compare_price, is_featured, disponibilite, product_images(url, is_primary, sort_order), product_variants(color, color_hex, image_url)`, { count: "exact" })
     .eq("is_active", true)
     .order("created_at", { ascending: false })
     .range(from, to);
@@ -65,6 +65,7 @@ export default async function ProductsPage({
                 price={p.price}
                 compare_price={p.compare_price}
                 is_featured={p.is_featured}
+                disponibilite={p.disponibilite ?? "stock"}
                 images={p.product_images as { url: string; is_primary: boolean; sort_order?: number }[]}
                 variants={p.product_variants as { color: string; color_hex: string; image_url?: string | null }[]}
                 aspect={aspect}

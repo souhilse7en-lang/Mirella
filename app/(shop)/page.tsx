@@ -24,7 +24,7 @@ export default async function HomePage() {
       .limit(3),
     supabase
       .from("products")
-      .select(`id, name, slug, price, compare_price, is_featured, product_images(url, is_primary, sort_order), product_variants(color, color_hex, image_url)`)
+      .select(`id, name, slug, price, compare_price, is_featured, disponibilite, product_images(url, is_primary, sort_order), product_variants(color, color_hex, image_url)`)
       .eq("is_active", true)
       .eq("is_featured", true)
       .order("created_at", { ascending: false })
@@ -132,6 +132,7 @@ export default async function HomePage() {
                     price={p.price}
                     compare_price={p.compare_price}
                     is_featured={p.is_featured}
+                    disponibilite={(p as { disponibilite?: string }).disponibilite ?? "stock"}
                     images={p.product_images as { url: string; is_primary: boolean; sort_order?: number }[]}
                     variants={p.product_variants as { color: string; color_hex: string; image_url?: string | null }[]}
                   />

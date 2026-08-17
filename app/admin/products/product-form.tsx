@@ -18,6 +18,8 @@ interface Product {
   price: number; compare_price: number | null;
   collection_id: string; is_active: boolean; is_featured: boolean;
   type_produit?: string;
+  disponibilite?: string;
+  delai_sur_commande?: string | null;
 }
 
 const TYPE_OPTIONS = [
@@ -84,6 +86,8 @@ export default function ProductForm({
       price: 0, compare_price: null,
       collection_id: "", is_active: true, is_featured: false,
       type_produit: defaultType,
+      disponibilite: "stock",
+      delai_sur_commande: null,
     }
   );
 
@@ -311,6 +315,34 @@ export default function ProductForm({
               Produit vedette (page d'accueil)
             </label>
           </div>
+          <div className="col-span-2">
+            <label className="text-sm font-medium block mb-1.5">Disponibilité</label>
+            <select
+              value={form.disponibilite ?? "stock"}
+              onChange={(e) => {
+                setField("disponibilite", e.target.value);
+                if (e.target.value === "stock") setField("delai_sur_commande", null);
+              }}
+              className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="stock">En stock</option>
+              <option value="sur_commande">Sur commande</option>
+            </select>
+          </div>
+          {form.disponibilite === "sur_commande" && (
+            <div className="col-span-2">
+              <label className="text-sm font-medium block mb-1.5">
+                Délai de livraison
+                <span className="text-muted-foreground font-normal ml-1">(ex : "7-10 jours")</span>
+              </label>
+              <input
+                placeholder="7-10 jours"
+                value={form.delai_sur_commande ?? ""}
+                onChange={(e) => setField("delai_sur_commande", e.target.value || null)}
+                className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+          )}
         </div>
       </section>
 

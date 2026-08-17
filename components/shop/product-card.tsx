@@ -10,6 +10,7 @@ interface ProductCardProps {
   price: number;
   compare_price?: number | null;
   is_featured?: boolean;
+  disponibilite?: string;
   images: { url: string; is_primary: boolean; sort_order?: number }[];
   variants?: { color: string; color_hex: string; image_url?: string | null }[];
   aspect?: string;
@@ -21,6 +22,7 @@ export default function ProductCard({
   price,
   compare_price,
   is_featured = false,
+  disponibilite = "stock",
   images,
   variants = [],
   aspect = "aspect-[3/4]",
@@ -66,22 +68,32 @@ export default function ProductCard({
           </div>
         )}
 
-        {is_featured && (
-          <span
-            className="absolute top-3 left-3 text-white text-[10px] px-2.5 py-1 rounded-full font-medium tracking-wide"
-            style={{ backgroundColor: "#C98A9B" }}
-          >
-            Nouveauté
-          </span>
-        )}
-        {hasDiscount && !is_featured && (
-          <span
-            className="absolute top-3 left-3 text-white text-[10px] px-2.5 py-1 rounded-full font-medium tracking-wide"
-            style={{ backgroundColor: "#4A2E38" }}
-          >
-            SOLDES
-          </span>
-        )}
+        <div className="absolute top-3 left-3 flex flex-col gap-1">
+          {is_featured && (
+            <span
+              className="text-white text-[10px] px-2.5 py-1 rounded-full font-medium tracking-wide"
+              style={{ backgroundColor: "#C98A9B" }}
+            >
+              Nouveauté
+            </span>
+          )}
+          {hasDiscount && !is_featured && (
+            <span
+              className="text-white text-[10px] px-2.5 py-1 rounded-full font-medium tracking-wide"
+              style={{ backgroundColor: "#4A2E38" }}
+            >
+              SOLDES
+            </span>
+          )}
+          {disponibilite === "sur_commande" && (
+            <span
+              className="text-[10px] px-2.5 py-1 rounded-full font-medium tracking-wide"
+              style={{ backgroundColor: "#C9A961", color: "#fff" }}
+            >
+              Sur commande
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Miniatures couleurs */}

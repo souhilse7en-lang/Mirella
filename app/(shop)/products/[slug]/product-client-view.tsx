@@ -43,12 +43,16 @@ export default function ProductClientView({
   images,
   typeProduit,
   collection,
+  disponibilite = "stock",
+  delaiSurCommande,
 }: {
   product: Product;
   variants: Variant[];
   images: ProductImage[];
   typeProduit: string;
   collection: { name: string; slug: string } | null;
+  disponibilite?: string;
+  delaiSurCommande?: string | null;
 }) {
   // Dédupliquer les couleurs depuis les variantes
   const colorMap = new Map<string, ColorEntry>();
@@ -192,6 +196,21 @@ export default function ProductClientView({
           <h1 className="text-3xl font-semibold tracking-tight mb-3" style={{ color: "#4A2E38" }}>
             {product.name}
           </h1>
+          {disponibilite === "sur_commande" && (
+            <div className="mb-3">
+              <span
+                className="inline-block text-xs px-3 py-1 rounded-full font-medium tracking-wide"
+                style={{ backgroundColor: "#C9A961", color: "#fff" }}
+              >
+                Sur commande
+              </span>
+              {delaiSurCommande && (
+                <p className="text-sm mt-1.5" style={{ color: "#9B6B76" }}>
+                  Livraison sous {delaiSurCommande}
+                </p>
+              )}
+            </div>
+          )}
           <div className="flex items-center gap-3">
             <span className="text-2xl font-semibold" style={{ color: hasDiscount ? "#C98A9B" : "#4A2E38" }}>
               {Number(product.price).toLocaleString("fr-FR")} DA

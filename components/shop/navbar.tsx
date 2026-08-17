@@ -35,8 +35,30 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
-          <Link href="/" className="text-2xl font-semibold tracking-[0.3em] uppercase" style={{ color: "#4A2E38" }}>
-            Mirella
+          <Link href="/" aria-label="Mirella — Accueil">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="168"
+              height="44"
+              viewBox="0 0 168 44"
+              aria-hidden="true"
+            >
+              <text
+                x="84"
+                y="26"
+                textAnchor="middle"
+                fontFamily="Georgia, 'Times New Roman', serif"
+                fontSize="21"
+                fontWeight="600"
+                letterSpacing="9"
+                fill="#4A2E38"
+              >
+                MIRELLA
+              </text>
+              <line x1="18" y1="36" x2="72" y2="36" stroke="#C9A961" strokeWidth="1" />
+              <circle cx="84" cy="36" r="2" fill="#C9A961" />
+              <line x1="96" y1="36" x2="150" y2="36" stroke="#C9A961" strokeWidth="1" />
+            </svg>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">

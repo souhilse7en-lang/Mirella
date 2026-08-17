@@ -44,6 +44,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         images={images}
         typeProduit={product.type_produit ?? "vetement"}
         collection={collection}
+        disponibilite={product.disponibilite ?? "stock"}
+        delaiSurCommande={product.delai_sur_commande ?? null}
       />
     </div>
   );
